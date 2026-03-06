@@ -1,98 +1,179 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
+import { useRef, useState } from "react";
+import {
+  Alert,
+  Animated,
+  Keyboard,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { HeroSection, LocationFeature } from "../../components/HeroSection";
+import { InputField } from "../../components/InputField";
+import { useAnimations, useImageAnimation } from "../../hooks/useAnimations";
 
-export default function HomeScreen() {
+const IMAGES = [
+  require("../../assets/healthy-food4.png"),
+  require("../../assets/healthy-food2.png"),
+];
+
+const INPUT_FIELDS = [
+  {
+    name: "email",
+    label: "Email",
+    placeholder: "Enter your email",
+    icon: "email" as const,
+    keyboardType: "email-address" as const,
+    autoCapitalize: "none" as const,
+  },
+  {
+    name: "password",
+    label: "Password",
+    placeholder: "Create a password",
+    icon: "lock" as const,
+    secureTextEntry: true,
+  },
+  {
+    name: "confirmPassword",
+    label: "Confirm Password",
+    placeholder: "Confirm your password",
+    icon: "lock-outline" as const,
+    secureTextEntry: true,
+  },
+];
+
+export default function SignUpPage() {
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [focused, setFocused] = useState<string | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
+  const { fadeAnimation, slideAnimation } = useAnimations();
+  const { currentImage, imageFade } = useImageAnimation(IMAGES);
+
+  const updateField = (field: string, value: string) =>
+    setForm((prev) => ({ ...prev, [field]: value }));
+  const onFocus = (field: string) => setFocused(field);
+
+  const handleSignUp = () => {
+    const { email, password, confirmPassword } = form;
+    if (!email || !password || !confirmPassword)
+      return Alert.alert("Error", "Please fill in all fields");
+    if (password !== confirmPassword)
+      return Alert.alert("Error", "Passwords do not match");
+    if (password.length < 6)
+      return Alert.alert("Error", "Password must be at least 6 characters");
+    Alert.alert("Success", "Welcome to FreshEats!");
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View style={s.container}>
+      <StatusBar style="light" />
+      <ScrollView
+        ref={scrollRef}
+        style={s.flex}
+        contentContainerStyle={s.scroll}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <HeroSection
+          currentImage={currentImage}
+          imageFade={imageFade}
+          onPress={() => Keyboard.dismiss()}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
+        <Animated.View
+          style={[
+            s.form,
+            {
+              opacity: fadeAnimation,
+              transform: [{ translateY: slideAnimation }],
+            },
+          ]}
+        >
+          <Text style={s.title}>Create Account</Text>
+          <Text style={s.subtitle}>Join our healthy food community</Text>
+          <LocationFeature />
+          <View style={s.inputs}>
+            {INPUT_FIELDS.map((f) => (
+              <InputField
+                key={f.name}
+                {...f}
+                value={form[f.name as keyof typeof form]}
+                onChangeText={(v: string) => updateField(f.name, v)}
+                isFocused={focused === f.name}
+                onFocus={() => onFocus(f.name)}
+                onBlur={() => setFocused(null)}
               />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+            ))}
+          </View>
+          <TouchableOpacity
+            style={s.btn}
+            onPress={handleSignUp}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="leaf" size={16} color="white" style={s.btnIcon} />
+            <Text style={s.btnText}>Start Healthy Eating</Text>
+          </TouchableOpacity>
+          <Text style={s.signIn}>
+            Already have an account?{" "}
+            <Text
+              style={s.link}
+              onPress={() => Alert.alert("Sign In", "Coming soon!")}
+            >
+              Sign In
+            </Text>
+          </Text>
+        </Animated.View>
+      </ScrollView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#f8f9fa" },
+  flex: { flex: 1 },
+  scroll: { flexGrow: 1, paddingBottom: 250 },
+  form: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 25,
+    backgroundColor: "white",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    marginTop: -25,
+    elevation: 10,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  title: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#2c3e50",
+    textAlign: "center",
+    marginBottom: 5,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  subtitle: {
+    fontSize: 13,
+    color: "#7f8c8d",
+    textAlign: "center",
+    marginBottom: 20,
   },
+  inputs: { marginBottom: 15 },
+  btn: {
+    backgroundColor: "#228b22",
+    padding: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 15,
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  btnIcon: { marginRight: 6 },
+  btnText: { color: "white", fontSize: 14, fontWeight: "700" },
+  signIn: { textAlign: "center", color: "#95a5a6", fontSize: 11 },
+  link: { color: "#228b22", fontWeight: "700" },
 });
