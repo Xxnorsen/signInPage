@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { GitHubUserCard } from "../../components/GitHubUserCard";
 
 const IMAGES = [
   require("../../assets/healthy-food4.png"),
@@ -364,6 +365,15 @@ const SignUpPage = () => {
                 Log in
               </Text>
             </Text>
+
+            {/* GitHub API Test Section */}
+            <View style={styles.apiTestSection}>
+              <Text style={styles.apiTestTitle}>GitHub API Test</Text>
+              <Text style={styles.apiTestSubtitle}>
+                Test networking with Axios
+              </Text>
+              <GitHubUserCard userId="1" />
+            </View>
           </Animated.View>
         </Pressable>
       </ScrollView>
@@ -573,6 +583,27 @@ const styles = StyleSheet.create({
   guidePassed: {
     color: "#228b22",
     fontWeight: "600",
+  },
+
+  // GitHub API Test Section Styles
+  apiTestSection: {
+    marginTop: 30,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#e9ecef",
+  },
+  apiTestTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#2c3e50",
+    textAlign: "center",
+    marginBottom: 5,
+  },
+  apiTestSubtitle: {
+    fontSize: 12,
+    color: "#7f8c8d",
+    textAlign: "center",
+    marginBottom: 20,
   },
 });
 
