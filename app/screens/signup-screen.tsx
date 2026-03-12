@@ -1,19 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
 import {
-    Alert,
-    Animated,
-    Image,
-    Keyboard,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Animated,
+  Image,
+  Keyboard,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const IMAGES = [
@@ -295,13 +294,7 @@ export default function SignUpScreen() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      Alert.alert("Welcome!", "Your account has been created successfully!", [
-        {
-          text: "Explore Developers",
-          onPress: () => router.push("/screens/github-profile-screen"),
-        },
-        { text: "Later", style: "cancel" },
-      ]);
+      Alert.alert("Welcome!", "Your account has been created successfully!");
     }
   };
 
