@@ -1,20 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
 import {
-  Alert,
-  Animated,
-  Image,
-  Keyboard,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Animated,
+    Image,
+    Keyboard,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { GitHubUserCard } from "../../components/GitHubUserCard";
 
 const IMAGES = [
   require("../../assets/healthy-food4.png"),
@@ -55,12 +55,12 @@ const useAnimations = () => {
       Animated.timing(fade, {
         toValue: 1,
         duration: 1200,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
       Animated.timing(slide, {
         toValue: 0,
         duration: 1000,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
     ]).start();
   }, [fade, slide]);
@@ -77,13 +77,13 @@ const useImageAnimation = (images: any[]) => {
       Animated.timing(fade, {
         toValue: 0,
         duration: 500,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }).start(() => {
         setCurrentIndex((prev) => (prev + 1) % images.length);
         Animated.timing(fade, {
           toValue: 1,
           duration: 500,
-          useNativeDriver: true,
+          useNativeDriver: false,
         }).start();
       });
     }, 3000);
@@ -132,6 +132,13 @@ const InputField = ({
       <TextInput
         style={[styles.input, error && styles.inputError]}
         placeholderTextColor={error ? "#dc3545" : "#999"}
+        autoCapitalize={props.autoCapitalize || "none"}
+        autoCorrect={false}
+        keyboardType={props.keyboardType || "default"}
+        editable={true}
+        selectTextOnFocus={true}
+        textContentType={props.secureTextEntry ? "password" : "none"}
+        importantForAutofill={props.secureTextEntry ? "no" : "auto"}
         {...props}
       />
     </View>
@@ -151,7 +158,7 @@ const HeroSection = ({
   <Pressable onPress={onPress}>
     <View style={styles.hero}>
       <Animated.View style={[styles.imgWrap, { opacity: imageFade }]}>
-        <Image source={currentImage} style={styles.img} />
+        <Image source={currentImage} style={styles.img} resizeMode="cover" />
       </Animated.View>
       <View style={styles.overlay}>
         <Text style={styles.heroTitle}>Fresh Food Delivered</Text>
@@ -200,7 +207,7 @@ const PasswordGuide = ({ password }: { password: string }) => {
   );
 };
 
-const SignUpPage = () => {
+export default function SignUpScreen() {
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -219,7 +226,6 @@ const SignUpPage = () => {
   const updateField = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
 
-    // Real-time validation
     const newErrors: typeof errors = { ...errors };
 
     if (field === "email") {
@@ -267,16 +273,13 @@ const SignUpPage = () => {
     const { email, password, confirmPassword } = form;
     const newErrors: typeof errors = {};
 
-    // Check if all fields are filled
     if (!email) newErrors.email = "Email required";
     if (!password) newErrors.password = "Password required";
     if (!confirmPassword) newErrors.confirmPassword = "Confirm password";
 
-    // Email format validation
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       newErrors.email = "Valid email needed";
 
-    // Password structure validation
     if (password) {
       if (password.length < 8) newErrors.password = "At least 8 characters";
       else if (!/[A-Z]/.test(password))
@@ -286,15 +289,19 @@ const SignUpPage = () => {
       else if (!/[0-9]/.test(password)) newErrors.password = "Need a number";
     }
 
-    // Confirm password validation
     if (confirmPassword && password !== confirmPassword)
       newErrors.confirmPassword = "Passwords don't match";
 
     setErrors(newErrors);
 
-    // If no errors, show success
     if (Object.keys(newErrors).length === 0) {
-      Alert.alert("Success", "You're all set!");
+      Alert.alert("Welcome!", "Your account has been created successfully!", [
+        {
+          text: "Explore Developers",
+          onPress: () => router.push("/screens/github-profile-screen"),
+        },
+        { text: "Later", style: "cancel" },
+      ]);
     }
   };
 
@@ -365,21 +372,12 @@ const SignUpPage = () => {
                 Log in
               </Text>
             </Text>
-
-            {/* GitHub API Test Section */}
-            <View style={styles.apiTestSection}>
-              <Text style={styles.apiTestTitle}>GitHub API Test</Text>
-              <Text style={styles.apiTestSubtitle}>
-                Test networking with Axios
-              </Text>
-              <GitHubUserCard userId="1" />
-            </View>
           </Animated.View>
         </Pressable>
       </ScrollView>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f5f5f5" },
@@ -398,6 +396,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
+    boxShadow: "0px -2px 10px rgba(0, 0, 0, 0.1)",
   },
   title: {
     fontSize: 22,
@@ -427,7 +426,6 @@ const styles = StyleSheet.create({
   signIn: { textAlign: "center", color: "#95a5a6", fontSize: 11 },
   link: { color: "#228b22", fontWeight: "700" },
 
-  // Hero section styles
   hero: { height: 280, position: "relative" },
   imgWrap: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
   img: {
@@ -472,7 +470,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // Location feature styles
   loc: {
     flexDirection: "row",
     alignItems: "center",
@@ -496,6 +493,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
   },
   locContent: { flex: 1 },
   locTitle: {
@@ -506,7 +504,6 @@ const styles = StyleSheet.create({
   },
   locText: { color: "#666", fontSize: 11, fontWeight: "500" },
 
-  // Input field styles
   inputWrap: { marginBottom: 16 },
   label: {
     fontSize: 14,
@@ -553,7 +550,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
 
-  // Password guide styles
   guide: {
     backgroundColor: "#f9f9f9",
     borderRadius: 12,
@@ -584,27 +580,4 @@ const styles = StyleSheet.create({
     color: "#228b22",
     fontWeight: "600",
   },
-
-  // GitHub API Test Section Styles
-  apiTestSection: {
-    marginTop: 30,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#e9ecef",
-  },
-  apiTestTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#2c3e50",
-    textAlign: "center",
-    marginBottom: 5,
-  },
-  apiTestSubtitle: {
-    fontSize: 12,
-    color: "#7f8c8d",
-    textAlign: "center",
-    marginBottom: 20,
-  },
 });
-
-export default SignUpPage;

@@ -1,11 +1,11 @@
 import React from "react";
 import {
-    ActivityIndicator,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useGitHubAPI } from "../hooks/useGitHubAPI";
 
@@ -51,9 +51,14 @@ export const GitHubUserCard: React.FC<GitHubUserCardProps> = ({ userId }) => {
         <Text style={styles.name}>{user.name || user.login}</Text>
         <Text style={styles.username}>@{user.login}</Text>
         {user.bio && <Text style={styles.bio}>{user.bio}</Text>}
-        {user.location && (
-          <Text style={styles.location}>📍 {user.location}</Text>
+        {user.company && (
+          <Text style={styles.company}>Company: {user.company}</Text>
         )}
+        {user.location && (
+          <Text style={styles.location}>Location: {user.location}</Text>
+        )}
+        {user.blog && <Text style={styles.blog}>Website: {user.blog}</Text>}
+        {user.email && <Text style={styles.email}>Email: {user.email}</Text>}
 
         <View style={styles.stats}>
           <View style={styles.statItem}>
@@ -68,6 +73,15 @@ export const GitHubUserCard: React.FC<GitHubUserCardProps> = ({ userId }) => {
             <Text style={styles.statNumber}>{user.following}</Text>
             <Text style={styles.statLabel}>Following</Text>
           </View>
+        </View>
+
+        <View style={styles.details}>
+          <Text style={styles.detailText}>
+            Joined: {new Date(user.created_at).toLocaleDateString()}
+          </Text>
+          <Text style={styles.detailText}>
+            Last Updated: {new Date(user.updated_at).toLocaleDateString()}
+          </Text>
         </View>
       </View>
     </View>
@@ -91,6 +105,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
+    boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
     alignItems: "center",
   },
   avatar: {
@@ -118,16 +133,32 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
   },
+  company: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 5,
+  },
+  blog: {
+    fontSize: 14,
+    color: "#007AFF",
+    marginBottom: 5,
+  },
+  email: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 10,
+  },
   location: {
     fontSize: 14,
     color: "#666",
-    marginBottom: 15,
+    marginBottom: 10,
   },
   stats: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
     marginTop: 10,
+    marginBottom: 15,
   },
   statItem: {
     alignItems: "center",
@@ -139,6 +170,18 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 12,
     color: "#666",
+  },
+  details: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#e9ecef",
+    width: "100%",
+  },
+  detailText: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 3,
   },
   loadingText: {
     marginTop: 10,
