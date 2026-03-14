@@ -17,6 +17,10 @@ export default function RootLayout() {
           name="screens/signup-screen"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="screens/test-api"
+          options={{ headerShown: false }}
+        />
       </Stack>
       <StatusBar style="auto" />
     </>
